@@ -52,5 +52,26 @@ def association_test(categories, test_level=0.05, test_type="ANOVA", printing=Tr
         if printing:
             if pval_anova <= test_level:
                 return("The ANOVA test rejects the equality of means at level "+str(test_level))
-            return ("The Kruskal Wallis test rejects the equality of means at level"+str(test_level))
         return pval_anova
+    
+
+def compute_association_cat_num(data: pd.DataFrame, num_features: list, cat_features: list, test_type: str="ANOVA") -> dict:
+    '''
+    '''
+    association=pd.DataFrame(index=num_features, columns=cat_features)
+    pvalue=pd.DataFrame(index=num_features, columns=cat_features)
+    for cat in cat_features:
+        association[cat]=[correlation_ratio(data[cat], np.array(data[num])) for num in num_features]
+        values_per_category=\
+        {
+            num_col:
+            [data[data[cat]==label][num_col]
+             for label in data[cat].unique()
+            ]
+            for num_col in pvalue.index
+        }
+        pvalue[cat]=[association_test(values_per_category[num_col], printing=False, test_type=test_type) \
+                     for num_col in pvalue.index]
+    return association, pvalue
+
+    
