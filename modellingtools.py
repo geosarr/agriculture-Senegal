@@ -16,24 +16,30 @@ metrics={"RMSE": "neg_mean_squared_error", "MAE": "neg_mean_absolute_error", "Me
 
 
           
-def display(scores, score_name, width=0.3, ax=None):
+def display(scores, score_name, width=0.3, ax=None, xlabel="", ylabel="", title=""):
     x = range(1, len(scores)+1)
     if ax==None:
         plt.bar(x, scores, width, label=score_name, color="green")
         plt.plot(x, [scores.mean()]*len(scores), label="mean "+score_name)
         plt.plot(range(1, len(scores)+1), [scores.std()]*len(scores), label="standard deviation "+score_name)
+        plt.xlabel(xlabel)
+        plt.ylabel(ylabel)
+        plt.title(title)
         plt.legend()
         plt.show()
     else:
         ax.bar(x, scores, width, label=score_name, color="green")
         ax.plot(x, [scores.mean()]*len(scores), label="mean "+score_name)
         ax.plot(range(1, len(scores)+1), [scores.std()]*len(scores), label="standard deviation "+score_name)
+        ax.set_xlabel(xlabel)
+        ax.set_ylabel(ylabel)
+        ax.set_title(title)
         ax.legend()
 
           
 
 
-def plot_learning_curve(model, X, Y, val_ratio = 0.25, nb_training = 100, rand_state=20):
+def plot_learning_curve(model, X, Y, val_ratio = 0.25, nb_training = 100, rand_state=20, put_mean_target=True):
     '''Plot the learning curve, model is a model pretrained, X is the dataframe of the explaining variables ,
     Y is the target, val_ratio is the ratio of data for evaluation
     nb_training designates the number of mini batches
@@ -49,9 +55,10 @@ def plot_learning_curve(model, X, Y, val_ratio = 0.25, nb_training = 100, rand_s
         train_errors.append(sqrt(mean_squared_error(y_train_pred, Y_train[:m])))
         val_errors.append(sqrt(mean_squared_error(y_val_pred, Y_val)))
     plt.figure(figsize = (20,10))
-    plt.plot(np.sqrt(train_errors), label = 'RMSE on training set')
-    plt.plot(np.sqrt(val_errors), label = 'RMSE on validation set')
-    plt.plot([Y.mean()]*len(train_errors), label = 'Mean of the target')
+    plt.plot(train_errors, label = 'RMSE on training set')
+    plt.plot(val_errors, label = 'RMSE on validation set')
+    if put_mean_target:
+        plt.plot([Y.mean()]*len(train_errors), label = 'Mean of the target')
     plt.xlabel('$n^{th}$ batch over ' + str(nb_training) + ' batches')
     plt.ylabel('Error')
     plt.legend()
@@ -66,13 +73,13 @@ def rmse(Y, Y_pred):
     
     
     
-def kfold(model, X, Y, k, metrics_name="RMSE", ax=None):
+def kfold(model, X, Y, k, metrics_name="RMSE", ax=None, xlabel="", ylabel="", title=""):
     '''
     Cross Validation (k fold)
     '''
     scores=- cross_val_score(model, X, Y, scoring = metrics[metrics_name], cv = k)
     if metrics_name=="RMSE": display(sqrt(scores), score_name=metrics_name, ax=ax)
-    else: display(scores, score_name=metrics_name, ax=ax)
+    else: display(scores, score_name=metrics_name, ax=ax, xlabel=xlabel, ylabel=ylabel, title=title)
 
 
 
@@ -80,20 +87,22 @@ def test_models(models, test_X, test_Y):
     '''Measures the performance of the models on the test set for comparison,
     Here the performance measure is the RMSE
     '''
-    d = DataFrame(columns=["Features", "Errors"])
+    d = DataFrame(columns=["Model", "RMSE"])
     for model in models:
-        d = d.append(DataFrame([[type(model).__name__, np.sqrt(mean_squared_error(model.predict(test_X), test_Y))]],\
-                                  columns=["Features", "Errors"]))
-    d=d.sort_values("Errors")
-    d.reset_index(inplace=True)
+        temp=DataFrame([[type(model).__name__, rmse(model.predict(test_X), test_Y)]],\
+                                  columns=["Model", "RMSE"])
+        d = d.append(DataFrame([[type(model).__name__, rmse(model.predict(test_X), test_Y)]],\
+                                  columns=["Model", "RMSE"]))
+    d=d.sort_values("RMSE")
+    d.reset_index(inplace=True, drop=True)
     return d
 
 
 
 def cv_np_reg(X, Y, k=5):
     '''
-    Cross validation for np reg model with k folds, all the regressors must be continuous
-    Output the RMSE of the 
+    Cross validation for non parametric regression model with k folds, all the regressors must be continuous
+    Output the RMSE of the predictions
     '''
     ## Creating the folds
     kf = KFold(n_splits=k, shuffle=True)
@@ -108,4 +117,4 @@ def cv_np_reg(X, Y, k=5):
                                                     )
                                  )
         print(str(pos+1)+ " validation(s) made")
-    display(np.array(evaluation))
+    display(np.array(evaluation), "KernelReg")

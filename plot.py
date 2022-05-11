@@ -8,7 +8,7 @@ import pandas as pd
 
 
 
-def plot_gmap(villages_location):
+def plot_gmap(villages_location, my_key=""):
     '''
     Using google maps to plot a map on a Jupyter Notebook: look at the documentation of gmaps library to see how to properly
     install it depending on your IDE.
@@ -19,7 +19,8 @@ def plot_gmap(villages_location):
     
     # building the maps
     fig = gmap.figure(map_type = 'SATELLITE', center = (14.3390167, -16.4111425), zoom_level = 10)
-    villages_location = gmap.symbol_layer(villages_location[["lat", "lng"]], fill_color='black', stroke_color='black', scale=1)
+    villages_location = gmap.symbol_layer(villages_location[["latitude", "longitude"]], 
+                                         fill_color='black', stroke_color='black', scale=1)
     fig.add_layer(villages_location)
     fig
 

@@ -13,7 +13,7 @@ def  import_data(path= "./data"):
         for file in files:
             if re.search('csv', file):
                 if len(D)==0:
-                    D = pd.read_csv(path + '\\' + file)
+                    D = pd.read_csv(os.path.join(path, file))
                 else:
-                    D = D.merge(pd.read_csv(path + '\\' + file), how = 'inner', on = 'id_men')
+                    D = D.merge(pd.read_csv(os.path.join(path, file)), how = 'inner', on = 'id_men')
     return D
