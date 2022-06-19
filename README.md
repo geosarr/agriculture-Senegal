@@ -7,4 +7,4 @@ We adopt a machine learning approach and a nonparametric econometrics approach t
 # Installation with conda
 - Create an environment with python version 3.10.x with `conda create -n name_of_environment python=3.10`
 - Activate the environment with the command `conda activate name_of_environment` 
-- Install the packages with the command (on linux) `pip install -r requirement.txt`
+- Install the packages with the command (on linux) `pip install -r requirements.txt`
