@@ -4,7 +4,7 @@ import pandas as pd
 
 
 def  import_data(path= "./data"):
-    regex = re.compile('.csv')
+    # regex = re.compile('.csv')
     D = []
     for root, dirs, files in os.walk(path):
         #print (root)

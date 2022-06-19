@@ -110,8 +110,8 @@ def cv_np_reg(X, Y, k=5):
     evaluation=[0]*k
     for pos, indices in enumerate(L):
         train_indices, test_indices = indices
-        X_train, X_test = X.iloc[train_indices,:], X.iloc[test_indices, :]
-        Y_train, Y_test = Y.iloc[train_indices], Y.iloc[test_indices]
+        X_train, X_test = X[train_indices,:], X[test_indices, :]
+        Y_train, Y_test = Y[train_indices], Y[test_indices]
         np_reg  = kernel_regression.KernelReg(endog = Y_train, exog = X_train, var_type = 'c'*X.shape[1])
         evaluation[pos] = np.sqrt(mean_squared_error(np_reg.fit(X_test)[0], Y_test
                                                     )
